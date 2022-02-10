@@ -2,19 +2,19 @@ package codes.sillysock.Commands;
 
 import codes.sillysock.API.CommandAPI;
 import codes.sillysock.API.EmbedAPI;
-import codes.sillysock.API.MemberAPI;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 
 import java.awt.*;
 
-public class DisconnectCommand extends ListenerAdapter {
+public class PMCommand extends ListenerAdapter {
 
     @Override
     public void onSlashCommand(SlashCommandEvent e) {
-        if (!e.getName().equals("disconnect")) return;
+        if (!e.getName().equals("pmuser")) return;
 
         InteractionHook hook = e.getHook();
         hook.setEphemeral(true);
@@ -22,30 +22,26 @@ public class DisconnectCommand extends ListenerAdapter {
 
         Member member = e.getMember();
         assert member != null;
-        if (!CommandAPI.HasDisconnectPermission(member)) {
+        if (!CommandAPI.HasAdministrator(member)) {
             hook.sendMessageEmbeds(EmbedAPI.BuildEmbed("Error: Insufficient Permissions", "Silly Sock", "You do not have the required permission to execute this command.", Color.RED)).queue();
             return;
         }
 
-        Member toDisconnect;
+        User toSend;
+        String message;
+
         try {
-            toDisconnect = e.getOption("user").getAsMember();
+            toSend = e.getOption("user").getAsMember().getUser();
+            message = e.getOption("message").getAsString();
         } catch (NullPointerException ex) {
             hook.sendMessageEmbeds(EmbedAPI.BuildEmbed("Error", "Silly Sock", "The member must be in this guild!", Color.RED)).queue();
             return;
         }
 
-        if (!MemberAPI.HasHighestRole(member, toDisconnect)) {
-            hook.sendMessageEmbeds(EmbedAPI.BuildEmbed("Error", "Silly Sock", "You cannot disconnect a member who has a highest or equal top role to you!", Color.RED)).queue();
-            return;
-        }
+        toSend.openPrivateChannel()
+                .flatMap(channel -> channel.sendMessage(message))
+                .queue();
 
-        if (!toDisconnect.getVoiceState().inAudioChannel()) {
-            hook.sendMessageEmbeds(EmbedAPI.BuildEmbed("Error", "Silly Sock", "Requested member is not in a voice channel!", Color.RED)).queue();
-            return;
-        }
-
-        e.getGuild().kickVoiceMember(toDisconnect).queue();
-        hook.sendMessageEmbeds(EmbedAPI.BuildEmbed("Disconnected", "Silly Sock", toDisconnect.getEffectiveName() + " has been disconnected.", Color.CYAN)).queue();
+        hook.sendMessageEmbeds(EmbedAPI.BuildEmbed("Message Sent", "Silly Sock", message + " has been sent to " + toSend.getName(), Color.CYAN)).queue();
     }
 }
