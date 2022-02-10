@@ -8,3 +8,13 @@ Version two of a bot that I developed for what.. a week?
 - Java 17
 - Maven
 - dude i don't know
+
+# Features
+
+- /say
+- /disconnect
+- /mute
+- /unmute
+- /timeout
+- /untimeout
+- /ping
