@@ -32,6 +32,8 @@ public class Atomic {
                 .addEventListeners(new NewGuildJoinEvent())
                 .addEventListeners(new UnmuteCommand())
                 .addEventListeners(new MuteCommand())
+                .addEventListeners(new SayCommand())
+                .addEventListeners(new DisconnectCommand())
                 .build();
 
         CommandData timeout = new CommandData("timeout", "Timeout a user.")
@@ -58,8 +60,18 @@ public class Atomic {
                 .addOptions(new OptionData(USER, "user", "User to mute.")
                         .setRequired(true));
 
+        CommandData say = new CommandData("say", "Say something in a channel!")
+                .addOptions(new OptionData(CHANNEL, "channel", "Where to send the message")
+                        .setRequired(true))
+                .addOptions(new OptionData(STRING, "message", "Message to send!")
+                        .setRequired(true));
+
+        CommandData disconnect = new CommandData("disconnect", "Disconnect someone from a voice channel")
+                .addOptions(new OptionData(USER, "user", "User to disconnect")
+                        .setRequired(true));
+
         CommandData ping = new CommandData("ping", "Get ping of bot.");
 
-        jda.updateCommands().addCommands(timeout, ping, untimeout, mute, unmute).queue();
+        jda.updateCommands().addCommands(timeout, ping, untimeout, mute, unmute, say, disconnect).queue();
     }
 }

@@ -30,4 +30,14 @@ public class CommandAPI {
         }
         return false;
     }
+
+    /**
+     * Checks if a member has {@code Permissions.VOICE_MOVE_OTHERS}
+     * @param member
+     * @returns hasPerm
+     */
+
+    public static boolean HasDisconnectPermission(Member member) {
+        return member.hasPermission(Permission.VOICE_MOVE_OTHERS);
+    }
 }
